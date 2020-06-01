@@ -1,0 +1,32 @@
+{
+  "name": "apisdk/apisdk",
+  "description": "API SDK",
+  "require": {
+    "php": ">=7.1",
+    "ext-json": "*",
+    "illuminate/support": "*",
+    "guzzlehttp/guzzle": "^6.4"
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true,
+  "autoload": {
+    "classmap": [
+      "src"
+    ],
+    "psr-4": {
+      "ApiSdk\\": "src/"
+    }
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "ApiSdk\\ApiSdkServiceProvider"
+      ],
+      "aliases": {
+        "CoreApi": "ApiSdk\\Facades\\CoreApi",
+        "FilesApi": "ApiSdk\\Facades\\FilesApi",
+        "AuthApi": "ApiSdk\\Facades\\AuthApi"
+      }
+    }
+  }
+}
