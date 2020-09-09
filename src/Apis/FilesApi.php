@@ -25,12 +25,67 @@ class FilesApi
     }
 
     /**
-     * @param $image
+     * @param string $image
+     * @param string $dir
+     * @param string|null $fileName
+     * @param string|null $fileExt
      * @return string|null
+     * @throws RequestProviderException
      */
-    public function uploadImage($image, $dir = null) : ?string
+    public function uploadImage(string $image, string $dir, string $fileName = null, string $fileExt = null) : ?string
     {
-        $result = $this->provider->request($this->api , 'post','images/add',  ['image' => $image, 'dir' => $dir]);
+        $result = $this->provider->request($this->api , 'post','images/add',  [
+            'image' => $image,
+            'dir' => $dir,
+            'file_name' => $fileName,
+            'file_ext' => $fileExt
+        ]);
+
+        return $result['code'] ?? null;
+    }
+
+    /**
+     * @param string $url
+     * @param string $dir
+     * @param array|null $stopPhrases
+     * @param string|null $fileName
+     * @param string|null $fileExt
+     * @return string|null
+     * @throws RequestProviderException
+     */
+    public function uploadImageByUrl(string $url, string $dir, array $stopPhrases = null, string $fileName = null, string $fileExt = null) : ?string
+    {
+        $result = $this->provider->request($this->api , 'post','images/add', [
+            'download_url' => $url,
+            'dir' => $dir,
+            'file_name' => $fileName,
+            'file_ext' => $fileExt,
+            'stop_phrases' => $stopPhrases
+        ]);
+
+        return $result['code'] ?? null;
+    }
+
+    /**
+     * @param array $images
+     * @param string $dir
+     * @param int $width
+     * @param int|null $height
+     * @param string|null $fileName
+     * @param string|null $fileExt
+     * @return string|null
+     * @throws RequestProviderException
+     */
+    public function makeCollage(array $images, string $dir, int $width, int $height = null, string $fileName = null, string $fileExt = null) : ?string
+    {
+        $result = $this->provider->request($this->api , 'post','images/make_collage', [
+            'images' => $images,
+            'width' => $width,
+            'height' => $height,
+            'dir' => $dir,
+            'file_name' => $fileName,
+            'file_ext' => $fileExt
+        ]);
 
         return $result['code'] ?? null;
     }
@@ -54,29 +109,5 @@ class FilesApi
             $add[] = 'height='.$height;
         }
         return env('IMAGES_URL') . '/' . $image.($add ? '?'.implode('&', $add) : '');
-    }
-
-    /**
-     * @param $url
-     * @param null $dir
-     * @param null $stopPhrases
-     * @return string|null
-     */
-    public function saveImageByUrl($url, $dir = null, $stopPhrases = null) : ?string
-    {
-        $image = file_get_contents($url);
-
-        if($stopPhrases and array_search($stopPhrases, $http_response_header))
-        {
-            return null;
-        }
-        else
-        {
-            $ext = pathinfo($url, PATHINFO_EXTENSION);
-
-            $result = $this->provider->request($this->api ,'post','images/add',  ['image' => base64_encode($image), 'ext' => $ext, 'dir' => $dir]);
-
-            return $result['code'] ?? null;
-        }
     }
 }
